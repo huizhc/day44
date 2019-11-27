@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <p>测试代码</p>
+    <p>顾客队列</p>
+        let custList = [<br>
+            new Customer(),<br>
+            new Customer(),<br>
+            new Customer(),<br>
+            new Customer(),<br>
+            new Customer()<br>
+        ];<br>
+        for (let i = 0; i < custList.length; i ++) {<br>
+            custList[i].diancai();<br>
+        }<br>
+    </p>
+    <script>
+    // var ifeRestaurant = new Restaurant({// 餐厅
+    //     cash: 1000000,//现金
+    //     seats: 20,// 座位
+    //     staff: [] //职员
+    // });
+
+    // var newCook = new Cook("Tony", 10000); //厨师
+    // ifeRestaurant.hire(newCook); //雇用
+
+    // console.log(ifeRestaurant.staff);
+
+    // ifeRestaurant.fire(newCook); 开除
+    // console.log(ifeRestaurant.staff);
+//         餐厅类
+        class Restaurant  {
+            constructor (obj) {
+                this.cash = obj.cash;
+                this.seats = obj.seats;
+                this.staff = obj.staff;
+            }
+            hire (st) {
+                //为职员分配id
+                st.id = this.staff.length;
+                this.staff.push(st);
+                console.log(st.name + '被雇用啦,员工编号是' + st.id + ',月薪' + st.money);
+            }
+            fire (st) {
+                if (this.staff.includes(st)) {
+                    this.staff.splice(this.staff.indexOf(st), 1);
+                }
+                console.log(st.name + '上班摸鱼被炒了，大家引以为戒');
+            }
+        }
+        // 属性：金钱，座位数量、职员列表
+        // 方法：招聘职员，解雇职员
+
+
+        // 职员类
+        // 属性：ID，姓名，工资
+        // 方法：完成一次工作
+        class Staff {
+            constructor (name, money) {
+                this.id = '';
+                this.name = name;
+                this.money = money;
+            }
+            Working () {
+                console.log('干活!');
+            }
+        }
+
+        // 服务员类，继承自职员
+        // 完成一次工作：如果参数是个数组，则记录客人点菜，如果参数不是数组则是上菜行为
+        class Waiter extends Staff {
+            constructor (name, money) {
+                super(name, money);
+                this.notepad = [];
+                this.cust = null;//当前招待的顾客
+            }
+            //招待顾客(记下菜品和顾客)
+            zhaodaiguke (food, cust) {
+                if (food instanceof Array) {
+                    for (let i = 0; i < food.length; i ++) {
+                        this.notepad.push(food[i].name);
+                    }
+                    this.cust = cust;
+                    console.log('我记下客人点了' + this.notepad.join());
+                    this.tongzhichushi(food);
+                } else {
+                    this.notepad = [];
+                    console.log('久等了，这是您的菜');
+                    this.cust.chi();
+                    this.cust = null;
+                }
+            }
+            //通知厨师
+            tongzhichushi (food) {
+                let cook = Cook.getInstance();
+                console.log('客人需要' + this.notepad.join() + ',师傅有劳啦');
+                cook.zuocai(food);
+
+            }
+            //获取实例
+            static getInstance () {
+                if (!this.instance) {
+                    this.instance = new Waiter();
+                }
+                return this.instance;
+            }
+        }
+        
+        // 厨师类，继承自职员
+        // 完成一次工作：烹饪出菜品
+        class Cook extends Staff {
+            constructor (name, money) {
+                super(name, money);
+            }
+            //做菜
+            zuocai (food) {
+                for (let i = 0; i < food.length; i ++) {
+                    console.log('铿铿~碦擦~扑哧~滋滋~噼里啪啦~哗~~' + food[i].name + '做好了');
+                }
+                this.tongzhifuwuyuan();
+            }
+            //通知服务员
+            tongzhifuwuyuan () {
+                let waiter = Waiter.getInstance();
+                console.log('取一下菜');
+                waiter.zhaodaiguke();
+            }
+            //获取实例
+            static getInstance () {
+                if (!this.instance) {
+                    this.instance = new Cook();
+                }
+                return this.instance;
+            }
+        }
+
+        // 顾客类
+        // 方法：点菜，吃
+        class Customer {
+            constructor () {
+                this.menu = [];
+            }
+            diancai () {
+                //随机点菜
+                let food = menuAll[Math.floor(Math.random() * (menuAll.length - 1))];
+                this.menu.push(food.name);
+                console.log('我点了' + this.menu.join());
+                let waiter = Waiter.getInstance();
+                waiter.zhaodaiguke([food], this);
+            }
+            chi () {
+                console.log('我只知道吃!' + this.menu.join() + '吃得我感动到落泪'); 
+                this.menu = [];
+                console.log('饱了~嗝~~(起身走出店门)');
+            }
+        }
+        
+        // 菜品类
+        // 属性：名字、烹饪成本、价格
+        class Food {
+            constructor (name, chengben, money) {
+                this.name = name;
+                this.chengben = chengben;
+                this.money = money;
+            }
+        }
+        //菜单
+        let menuAll = [
+            new Food('番茄鸡蛋', 5, 15),
+            new Food('土豆炒肉', 5, 15),
+            new Food('葱炒回锅肉', 5, 15),
+            new Food('红烧茄子', 5, 15),
+            new Food('腐竹炒肉', 5, 15)
+        ]
+
+    </script>
+</body>
+</html>
